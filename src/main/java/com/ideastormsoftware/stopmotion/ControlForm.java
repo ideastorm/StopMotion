@@ -11,10 +11,15 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.imageio.ImageIO;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JFormattedTextField;
 import javax.swing.JOptionPane;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileSystemView;
+import javax.swing.text.DefaultFormatter;
 
 /**
  *
@@ -41,6 +46,13 @@ public class ControlForm extends javax.swing.JFrame {
         String datecode = new SimpleDateFormat("YYYY-MM-dd").format(new Date());
         folder = new File(fw.getDefaultDirectory().getAbsolutePath() + File.separator + "StopMotion" + File.separator + datecode);
         folder.mkdirs();
+        JComponent comp = jSpinner1.getEditor();
+        JFormattedTextField field = (JFormattedTextField) comp.getComponent(0);
+        DefaultFormatter formatter = (DefaultFormatter) field.getFormatter();
+        formatter.setCommitsOnValidEdit(true);
+        jSpinner1.addChangeListener((ChangeEvent e) -> {
+            camera.selectCamera(Integer.parseInt(jSpinner1.getValue().toString()));
+        });
     }
 
     /**
@@ -77,9 +89,14 @@ public class ControlForm extends javax.swing.JFrame {
             .addGap(0, 240, Short.MAX_VALUE)
         );
 
-        jLabel1.setText("Project Name");
+        jLabel1.setText("Scene Name");
 
         jSpinner1.setModel(new javax.swing.SpinnerNumberModel(0, 0, 3, 1));
+        jSpinner1.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                jSpinner1PropertyChange(evt);
+            }
+        });
 
         jLabel2.setText("Input Camera");
 
@@ -146,8 +163,9 @@ public class ControlForm extends javax.swing.JFrame {
 
     private void captureButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_captureButtonActionPerformed
         BufferedImage image = camera.getCurrentImage();
-        if (image == null)
+        if (image == null) {
             return;
+        }
         preview.setLastImage(image);
 
         String projectName = folderEdit.getText().trim();
@@ -179,6 +197,9 @@ public class ControlForm extends javax.swing.JFrame {
         }
 
     }//GEN-LAST:event_playbackButtonActionPerformed
+
+    private void jSpinner1PropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jSpinner1PropertyChange
+    }//GEN-LAST:event_jSpinner1PropertyChange
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton captureButton;

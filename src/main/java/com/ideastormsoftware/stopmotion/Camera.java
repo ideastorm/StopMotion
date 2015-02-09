@@ -14,6 +14,20 @@ public class Camera implements ImageSource {
 
     private static final CameraThread[] cameraThreads = new CameraThread[16];
 
+    static {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            Camera.close();
+        }));
+    }
+
+    public static void close() {
+        for (CameraThread cameraThread : cameraThreads) {
+            if (cameraThread != null) {
+                cameraThread.close();
+            }
+        }
+    }
+
     private int selectedCamera;
 
     public Camera() {
@@ -34,6 +48,7 @@ public class Camera implements ImageSource {
         }
     }
 
+    @Override
     public BufferedImage getCurrentImage() {
         if (cameraThreads[selectedCamera] != null) {
             return cameraThreads[selectedCamera].getCurrentImage();
@@ -55,6 +70,7 @@ public class Camera implements ImageSource {
             capture = new VideoCapture(cameraIndex);
             targetFps = 29.97;
             paused = false;
+            currentImage = new BufferedImage(4, 3, BufferedImage.TYPE_3BYTE_BGR);
         }
 
         private void loop() {

@@ -55,7 +55,8 @@ public class Playback extends Thread implements ImageSource {
         }
         long target = 1_000_000_000 / 15;
         long remaining = target - System.nanoTime() + nanoTime;
-        delay(remaining);
+        if (remaining > 0)
+            delay(remaining);
     }
 
 }
